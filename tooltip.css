@@ -1,0 +1,14 @@
+
+.paragraph {
+	max-width: 30em;
+	line-height: 1;
+
+}
+
+.tooltipster-default {
+	border-radius: 5px;
+	border-bottom: 3px solid #f71169;
+	background: rgb(34,34,34);
+	color: #fff;
+	padding: 4px;
+}
