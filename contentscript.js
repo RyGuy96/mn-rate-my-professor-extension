@@ -126,41 +126,25 @@ function getSchoolRMPId() {
 }
 
 
-
 /**
  * Add summary column with professor ratings.
  */
 function addRMPColumn() {
 
-    // Remove last column if one was prev added by extension
-    if (document.getElementsByClassName("RMPCell").length > 0) {
-        $('td.RMPCell:last-child').remove();
-    }
-    if($('.RMPHeader').length > 0){
-        $('.RMPHeader').remove();
-    }
+    removeOldColumn();
 
     let table = document.querySelector("#searchResultsContainer > table");
     let className = "";
+
     if (table !== null) {
-        let myurl = "https://search-production.ratemyprofessors.com/solr/rmp/select/?solrformat=true&rows=2&wt=json&q=";
         let newCell;
         let columnValue = 0;
         let found = false;
+        // locateThenPopulateCell() TODO: get working with below
         for (let i = 0, row; row = table.rows[i]; i++) {
             if (i === 0) {
                 let ratingCell = row.insertCell(row.length);
-                ratingCell.innerHTML = "Overall Rating";
-                ratingCell.style.fontWeight = "bold";
-                ratingCell.style.verticalAlign = "bottom";
-                ratingCell.style.paddingLeft = "1em";
-                ratingCell.style.paddingRight = "1em";
-                ratingCell.style.fontSize = "12px";
-                ratingCell.style.color = "white";
-                ratingCell.style.backgroundColor = "#222222";
-                ratingCell.className = "RMPHeader";
-                ratingCell.borderColor = "#f71169"
-
+                applyStyles(ratingCell);
             } else {
                 newCell = row.insertCell(row.length);
             }
@@ -169,22 +153,7 @@ function addRMPColumn() {
                     let professor = col.innerText;
                     if (professor.indexOf(',') >= 0) {
                         let fullName = col.innerText;
-                        fullName = fullName.replace(/(\r\n|\n|\r)/gm, "");
-                        let splitName = fullName.split(",");
-                        let lastName = splitName[0];
-                        let firstName = splitName[1];
-                        let middleName;
-                        if (splitName.length > 2) {
-                            middleName = splitName[2];
-                            middleName = middleName.toLowerCase();
-                        }
-                        lastName = lastName.toLowerCase();
-                        lastName = lastName.trim();
-                        firstName = firstName.toLowerCase();
-                        firstName = firstName.trim();
-                        myurl1 = myurl + firstName + "+" + lastName + "+AND+schoolid_s%" + getSchoolRMPId();
-                        let runAgain = true;
-                        GetProfessorRating(myurl1, newCell, splitName, firstName, middleName, runAgain);
+                        populateCell(fullName, newCell);
                     }
                 }
                 if ($(col).hasClass('yui-dt0-col-Instructor')) {
@@ -194,6 +163,94 @@ function addRMPColumn() {
             }
         }
     }
+}
+
+
+
+/**
+ * Remove last column if one was previously added by extension.
+ */
+function removeOldColumn(){
+    if (document.getElementsByClassName("RMPCell").length > 0) {
+        $('td.RMPCell:last-child').remove();
+    }
+    let existingRMPColumn = $('.RMPHeader');
+    if(existingRMPColumn.length > 0){
+        existingRMPColumn.remove();
+    }
+}
+
+
+
+/**
+ * Apply syles to tooltip
+ * @param ratingCell {element}
+ */
+function applyStyles(ratingCell){
+    ratingCell.innerHTML = "Overall Rating";
+    ratingCell.style.fontWeight = "bold";
+    ratingCell.style.verticalAlign = "bottom";
+    ratingCell.style.paddingLeft = "1em";
+    ratingCell.style.paddingRight = "1em";
+    ratingCell.style.fontSize = "12px";
+    ratingCell.style.color = "white";
+    ratingCell.style.backgroundColor = "#222222";
+    ratingCell.className = "RMPHeader";
+    ratingCell.borderColor = "#f71169"
+}
+
+
+// TODO get this working in above
+// /**
+//  * Parse names, lookup RMP ratings, and populate all cells in column.
+//  */
+// function locateThenPopulateCell(i, found, row, columnValue) {
+//     let newCell;
+//     if (i === 0) {
+//         newCell = row.insertCell(row.length);
+//         applyStyles(newCell);
+//     } else {
+//         let newCell = row.insertCell(row.length);
+//     }
+//     for (let j = 0, col; col = row.cells[j]; j++) {
+//         if (found && j === columnValue) {
+//             let professor = col.innerText;
+//             if (professor.indexOf(',') >= 0) {
+//                 let fullName = col.innerText;
+//                 populateCell(fullName, newCell);
+//             }
+//         }
+//         if ($(col).hasClass('yui-dt0-col-Instructor')) {
+//             columnValue = j;
+//             found = true;
+//         }
+//     }
+//     return [columnValue, found];
+// }
+
+/**
+ * Parse name, lookup RMP rating, and populate single cell.
+ * @param fullName {String} professor name from ...minnstate.edu page.
+ * @param newCell {element} new cells where professor data to be added.
+ */
+function populateCell(fullName, newCell){
+    let myurl = "https://search-production.ratemyprofessors.com/solr/rmp/select/?solrformat=true&rows=2&wt=json&q=";
+    fullName = fullName.replace(/(\r\n|\n|\r)/gm, "");
+    let splitName = fullName.split(",");
+    let lastName = splitName[0];
+    let firstName = splitName[1];
+    let middleName;
+    if (splitName.length > 2) {
+        middleName = splitName[2];
+        middleName = middleName.toLowerCase();
+    }
+    lastName = lastName.toLowerCase();
+    lastName = lastName.trim();
+    firstName = firstName.toLowerCase();
+    firstName = firstName.trim();
+    myurl1 = myurl + firstName + "+" + lastName + "+AND+schoolid_s%" + getSchoolRMPId();
+    let runAgain = true;
+    GetProfessorRating(myurl1, newCell, splitName, firstName, middleName, runAgain);
 }
 
 
