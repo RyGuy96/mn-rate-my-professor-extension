@@ -1,39 +1,71 @@
-// Add column if at minnstate.edu
-addRMPColumn();
 
-// Reload script for page change
-var topNav = document.querySelector("#yui-dt0-paginator0");
-var bottomNav = document.querySelector("#yui-dt0-paginator1");
+//TODO: this really needs some at least rudimentary error handling
+main();
 
-var elems = [];
-elems.push.apply(elems, topNav.querySelectorAll("a.yui-pg-page,span.yui-pg-page"));
-elems.push.apply(elems, bottomNav.querySelectorAll("a.yui-pg-page,span.yui-pg-page"));
+/**
+ * Set all listeners and populate current page with RMP data
+ */
+function main() {
+    addRMPColumn();
+    handlePagination();
+    handleIllegalClicks();
+}
 
-for (let step = 0; step < elems.length; step++) {
-    elems[step].addEventListener("click", function() {
-        chrome.runtime.sendMessage({
-            url: "",
-            type: "reload",
-            response: {}
+
+/**
+ * Set listeners to reload script to create new column if paginator clicked.
+ */
+function handlePagination() {
+    let elems = [];
+
+    let topNav = document.querySelector("#yui-dt0-paginator0");
+    let bottomNav = document.querySelector("#yui-dt0-paginator1");
+
+    elems.push.apply(elems, topNav.querySelectorAll("a.yui-pg-page,span.yui-pg-page"));
+    elems.push.apply(elems, bottomNav.querySelectorAll("a.yui-pg-page,span.yui-pg-page"));
+
+    for (let i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", function() {
+            chrome.runtime.sendMessage({
+                url: "",
+                type: "reload",
+                response: {}
+            });
         });
-    });
-}
+    }
 
-// Reload whole page for illegal button clicks (next, last, etc. click other buttons and so can't be easily handled)
-var elems2 = [];
-elems2.push.apply(elems2,  topNav.querySelectorAll("a.yui-pg-first,a.yui-pg-previous,a.yui-pg-next,a.yui-pg-last"));
-elems2.push.apply(elems2, bottomNav.querySelectorAll("a.yui-pg-first,a.yui-pg-previous,a.yui-pg-next,a.yui-pg-last"));
-
-for (let step1 = 0; step1 < elems2.length; step1++) {
-    elems2[step1].addEventListener("click", function() {
-        window.location.reload();
-    });
 }
 
 
-// Determine which school's registration page is being looked at by referencing location image in table
-// ToDo data should be in json or xml doc: this alsmost worked, changed in manifest:
-// https://stackoverflow.com/questions/46667199/where-to-store-static-json-data-in-a-chrome-extension
+/**
+ * Reload whole page for illegal button clicks (next, last, etc. all result in virtual cascading button clicks
+ * that can't be easily handled).
+ * TODO: this is ridiculously sloppy; extension shouldn't inhibit normal user behavior in any way.
+ */
+function handleIllegalClicks() {
+    let elems2 = [];
+
+    let topNav = document.querySelector("#yui-dt0-paginator0");
+    let bottomNav = document.querySelector("#yui-dt0-paginator1");
+
+    elems2.push.apply(elems2, topNav.querySelectorAll("a.yui-pg-first,a.yui-pg-previous,a.yui-pg-next,a.yui-pg-last"));
+    elems2.push.apply(elems2, bottomNav.querySelectorAll("a.yui-pg-first,a.yui-pg-previous,a.yui-pg-next,a.yui-pg-last"));
+
+    for (let step1 = 0; step1 < elems2.length; step1++) {
+        elems2[step1].addEventListener("click", function () {
+            window.location.reload();
+        });
+    }
+
+}
+
+
+/**
+ * Determine which school's registration page is being looked at by referencing location image in table
+ * that can't be easily handled).
+ * TODO school data should be in json or xml doc not a million if-elses: this almost worked, changed in manifest:
+ * https://stackoverflow.com/questions/46667199/where-to-store-static-json-data-in-a-chrome-extension
+ */
 function getSchoolRMPId() {
 
     // Location cells often empty, so need to search whole table until find one
@@ -94,6 +126,10 @@ function getSchoolRMPId() {
 }
 
 
+
+/**
+ * Add summary column with professor ratings.
+ */
 function addRMPColumn() {
 
     // Remove last column if one was prev added by extension
@@ -137,8 +173,9 @@ function addRMPColumn() {
                         let splitName = fullName.split(",");
                         let lastName = splitName[0];
                         let firstName = splitName[1];
+                        let middleName;
                         if (splitName.length > 2) {
-                            var middleName = splitName[2];
+                            middleName = splitName[2];
                             middleName = middleName.toLowerCase();
                         }
                         lastName = lastName.toLowerCase();
@@ -160,6 +197,9 @@ function addRMPColumn() {
 }
 
 
+/**
+ * Lookup and populate professor ratings on Rate My Professor.
+ */
 function GetProfessorRating(myurl1, newCell, splitName, firstName) {
 
     chrome.runtime.sendMessage({
@@ -189,6 +229,10 @@ function GetProfessorRating(myurl1, newCell, splitName, firstName) {
     });
 }
 
+
+/**
+ * Add popup when hover over professor rating column with summary data.
+ */
 function AddTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
     chrome.runtime.sendMessage({
         url: allprofRatingsURL,

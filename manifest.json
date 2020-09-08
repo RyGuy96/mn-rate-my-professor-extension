@@ -16,8 +16,8 @@
 		"scripts": ["background.js"],
 		"persistent": false
 		},
-		"icons": { "16": "Images/MnLogo.png",
-			"48": "Images/MnLogo.png",
-		 "128": "Images/MnLogo.png" },
+		"icons": { "16": "Images/icon16.png",
+			"48": "Images/icon48.png",
+		 "128": "Images/icon128.png" },
 	"manifest_version" : 2
 }
