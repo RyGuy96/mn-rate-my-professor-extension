@@ -6,7 +6,7 @@
  * each professor with summary statistics.
  * Note: Both a background.js and content.js script are needed, as both files are granted differing permission by Chrome.
  * TODO: this script really needs some at least rudimentary error handling.
- * @author: Ryan Lenea
+ * @author: Ryan Lenea, Joseph Dirtay
  */
 
 main();
