@@ -226,6 +226,7 @@ function getProfessorRating(myurl1, newCell) {
             if (profRating !== undefined) {
                 let profURL = "http://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + profID;
                 newCell.innerHTML = "<a href=\"" + profURL + "\" target=\"_blank\">" + profRating + "</a>";
+                // TODO: max=20, is there reason for this? is it going to get more ratings than that?
                 let allprofRatingsURL = "https://www.ratemyprofessors.com/paginate/professors/ratings?tid=" + profID + "&page=0&max=20";
                 addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName);
             } else {
@@ -241,7 +242,7 @@ function getProfessorRating(myurl1, newCell) {
 
 /**
  * Lookup professor data and add popup when hover over professor rating column with summary data.
- * Note: With the RMP API you can't get many of the rating statistics, so they are calculated independently here.
+ * Note: With the RMP API you can't get any of the cumulative rating statistics, so they are calculated independently here.
  * @param newCell {element} new cell to be added to table.
  * @param allprofRatingsURL {string} url for the given professor.
  * @param realFirstName {string} formatted first name.
@@ -260,9 +261,17 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
         let easyRating = 0;
         let wouldTakeAgain = 0;
         let wouldTakeAgainNACount = 0;
+
+        //RYAN SPACEAPP ADDED START
+        // console.log(resp.ratings[0]);
+        let attendanceRequired = 0;
+        let attendanceRequiredNACount = 0;
+        //RYAN SPACEAPP ADDED END
+
         let foundFirstReview = false;
         let firstReview = "";
 
+        // Calculate rating statistics, factoring in non-responders (N/A).
         for (let i = 0; i < resp.ratings.length; i++) {
             easyRating += resp.ratings[i].rEasy;
             if (resp.ratings[i].rWouldTakeAgain === "Yes") {
@@ -270,6 +279,14 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
             } else if (resp.ratings[i].rWouldTakeAgain === "N/A") {
                 wouldTakeAgainNACount++;
             }
+            //RYAN SPACEAPP ADDED START
+            if (resp.ratings[i].attendance === "Mandatory") {
+                attendanceRequired++;
+            } else if (resp.ratings[i].attendance === "N/A") {
+                attendanceRequiredNACount++;
+            }
+            //RYAN SPACEAPP ADDED END
+
             if (!foundFirstReview) {
                 firstReview = resp.ratings[i].rComments;
                 foundFirstReview = true;
@@ -290,8 +307,20 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
             wouldTakeAgain = "N/A";
         }
 
+        //RYAN SPACEAPP ADDED START
 
-        let div = formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, firstReview);
+
+        if (resp.ratings.length > 1) {
+            attendanceRequired = ((attendanceRequired / (resp.ratings.length - attendanceRequiredNACount)) * 100)
+                .toFixed(0)
+                .toString() + "%";
+        } else {
+            wouldTakeAgain = "N/A";
+        }
+
+
+        let div = formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, firstReview);
+        //RYAN SPACEAPP ADDED END
         newCell.class = "tooltip";
         putDataIntoTooltip(newCell, div);
 
@@ -308,7 +337,7 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
  * @param firstReview {string} the most recent review.
  * @returns {HTMLDivElement} the content to be placed into the tooltip.
  */
-function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, firstReview) {
+function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, firstReview) {
 
     let title = document.createElement("h3");
     title.textContent = "Rate My Professor Details";
@@ -323,6 +352,11 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     let wouldTakeAgainText = document.createElement("p");
     wouldTakeAgainText.textContent = "Would take again: " + wouldTakeAgain;
 
+    //RYAN SPACEAPP ADDED START
+    let attendanceRequiredText = document.createElement("p");
+    wouldTakeAgainText.textContent = "Attendance Required: " + attendanceRequired;
+    //RYAN SPACEAPP ADDED START
+
     let classText = document.createElement("p");
     classText.textContent = "Most recent review: ";
 
@@ -335,6 +369,7 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     div.appendChild(professorText);
     div.appendChild(easyRatingText);
     div.appendChild(wouldTakeAgainText);
+    div.appendChild(attendanceRequiredText);
     div.appendChild(classText);
     div.appendChild(commentText);
 
