@@ -315,7 +315,7 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
                 .toFixed(0)
                 .toString() + "%";
         } else {
-            wouldTakeAgain = "N/A";
+            attendanceRequired = "N/A";
         }
 
 
@@ -354,7 +354,7 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
 
     //RYAN SPACEAPP ADDED START
     let attendanceRequiredText = document.createElement("p");
-    wouldTakeAgainText.textContent = "Attendance Required: " + attendanceRequired;
+    attendanceRequiredText.textContent = "Attendance Required: " + attendanceRequired;
     //RYAN SPACEAPP ADDED START
 
     let classText = document.createElement("p");
