@@ -91,6 +91,7 @@ function getSchoolRMPId() {
         }
     }
 
+    // School ID as key, title as value. Loop structure, IF title = key.value, return key
     if (title.includes("Winona") || title.includes("WSU")) {
         return "3A1214"
     }
@@ -393,6 +394,7 @@ function putDataIntoTooltip(newCell, div){
                     theme: 'tooltipster-default',
                     side: 'right',
                     content: div,
+                    interactive: true,
                     contentAsHTML: true,
                     delay: 100
                 })
@@ -400,8 +402,6 @@ function putDataIntoTooltip(newCell, div){
         }
     });
 }
-
-
 
 /**
  * Remove last column if one was previously added by extension.
