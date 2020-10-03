@@ -256,6 +256,8 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
         type: "tooltip"
     }, function(response) {
 
+        const TAGS_PER_PROF = 5;
+
         let resp = response.JSONresponse;
 
         //Build content for professor tooltip
@@ -267,6 +269,8 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
         // console.log(resp.ratings[0]);
         let attendanceRequired = 0;
         let attendanceRequiredNACount = 0;
+
+        let profTags = {};
         //RYAN SPACEAPP ADDED END
 
         let foundFirstReview = false;
@@ -286,7 +290,16 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
             } else if (resp.ratings[i].attendance === "N/A") {
                 attendanceRequiredNACount++;
             }
-            //RYAN SPACEAPP ADDED END
+
+            // Keep running total of tag counts (three per review).
+            let singleRatingTags = resp.ratings[i].teacherRatingTags;
+            singleRatingTags.forEach(function (tag) {
+                if (profTags.hasOwnProperty(tag)) {
+                    profTags[tag]++;
+                } else {
+                    profTags[tag] = 1;
+                }
+            });
 
             if (!foundFirstReview) {
                 firstReview = resp.ratings[i].rComments;
@@ -319,8 +332,16 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
             attendanceRequired = "N/A";
         }
 
+        //TODO process of getting counts should be shorter; shouldn't need helper sortByCount(); at present goes: data -> map -> array -> other array.
+        // Get x most mentioned tags for professor from hashmap of values.
+        let topTags = sortByCount(profTags);
+        topTags = topTags.slice(0, TAGS_PER_PROF);
+        let tagsToInclude = [];
+        for (let j = 0; j < topTags.length; j++) {
+            tagsToInclude.push(topTags[j].name);
+        }
 
-        let div = formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, firstReview);
+        let div = formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, firstReview);
         //RYAN SPACEAPP ADDED END
         newCell.class = "tooltip";
         putDataIntoTooltip(newCell, div);
@@ -338,7 +359,7 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
  * @param firstReview {string} the most recent review.
  * @returns {HTMLDivElement} the content to be placed into the tooltip.
  */
-function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, firstReview) {
+function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, firstReview) {
 
     let title = document.createElement("h3");
     title.textContent = "Rate My Professor Details";
@@ -356,6 +377,10 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     //RYAN SPACEAPP ADDED START
     let attendanceRequiredText = document.createElement("p");
     attendanceRequiredText.textContent = "Attendance Required: " + attendanceRequired;
+
+    let topTagsText = document.createElement("p");
+    topTagsText.textContent = "Top Tags: " + tagsToInclude.join(", ");
+
     //RYAN SPACEAPP ADDED START
 
     let classText = document.createElement("p");
@@ -371,6 +396,7 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     div.appendChild(easyRatingText);
     div.appendChild(wouldTakeAgainText);
     div.appendChild(attendanceRequiredText);
+    div.appendChild(topTagsText);
     div.appendChild(classText);
     div.appendChild(commentText);
 
@@ -432,4 +458,27 @@ function applyStyles(ratingCell){
     ratingCell.style.backgroundColor = "#222222";
     ratingCell.className = "RMPHeader";
     ratingCell.borderColor = "#f71169"
+}
+
+
+/**
+ * Sort a map by the value of the items descending.
+ * @param wordsMap {map}
+ * @returns {{name: string, total: *}[]}
+ */
+function sortByCount(wordsMap) {
+
+    var finalWordsArray = [];
+    finalWordsArray = Object.keys(wordsMap).map(function (key) {
+        return {
+            name: key,
+            total: wordsMap[key]
+        };
+    });
+
+    finalWordsArray.sort(function (a, b) {
+        return b.total - a.total;
+    });
+
+    return finalWordsArray;
 }
