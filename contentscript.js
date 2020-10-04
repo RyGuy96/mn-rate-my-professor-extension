@@ -95,6 +95,11 @@ function getSchoolRMPId() {
     return getUniCode(title);
 }
 
+/**
+ * Get RMP id school code with school name.
+ * @param title {string} name of school to lookup.
+ * @returns {string} school code.
+ */
 function getUniCode(title) {
     let uni_codes = {
         "3A1214":["Winona"],
@@ -128,6 +133,7 @@ function getUniCode(title) {
 
     return code;
 }
+
 
 /**
  * All functionality to create a RMP column with tooltips and ensure multiple columns not added, encompassed here.
@@ -235,6 +241,7 @@ function getProfessorRating(myurl1, newCell) {
 
 
 /**
+ * TODO: this method is getting kinda long, shorten up.
  * Lookup professor data and add popup when hover over professor rating column with summary data.
  * Note: With the RMP API you can't get any of the cumulative rating statistics, so they are calculated independently here.
  * @param newCell {element} new cell to be added to table.
@@ -326,7 +333,6 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
         }
 
         // Sort comments by helpfulness rating
-        let orderedComments = [];
         comments = sortByCount(comments);
         let commentsSorted = [];
         for (let k = 0; k < comments.length; k++) {
@@ -343,10 +349,6 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
 
 }
 
-
-// function reconcileNonresponses(newCell, div){
-//
-// }
 
 /**
  * Formats a given professor's stats into a div, to (elsewhere) be placed into a tooltip.
@@ -376,7 +378,7 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     wouldTakeAgainText.textContent = "Would take again: " + wouldTakeAgain;
 
     let attendanceRequiredText = document.createElement("p");
-    attendanceRequiredText.textContent = "Attendance Required: " + attendanceRequired;
+    attendanceRequiredText.textContent = "Say Attendance Required: " + attendanceRequired;
 
     let topTagsText = document.createElement("p");
     topTagsText.textContent = "Top Tags: " + tagsToInclude.join(", ");
