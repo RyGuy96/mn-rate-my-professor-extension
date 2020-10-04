@@ -343,6 +343,11 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
 
 }
 
+
+// function reconcileNonresponses(newCell, div){
+//
+// }
+
 /**
  * Formats a given professor's stats into a div, to (elsewhere) be placed into a tooltip.
  * @param realFirstName {string} professor first name formatted.
@@ -353,7 +358,6 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
  * @param tagsToInclude {array} most popular tags listed in reviews.
  * @param commentsSorted {array} reviews sorted by number of likes descending.
  * @returns {HTMLDivElement} the content to be placed into the tooltip.
-
  */
 function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted) {
 
@@ -465,7 +469,7 @@ function applyStyles(ratingCell){
  */
 function sortByCount(wordsMap) {
 
-    var finalWordsArray = [];
+    let finalWordsArray = [];
     finalWordsArray = Object.keys(wordsMap).map(function (key) {
         return {
             name: key,
