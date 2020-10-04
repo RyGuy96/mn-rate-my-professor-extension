@@ -6,7 +6,7 @@
  * each professor with summary statistics.
  * Note: Both a background.js and content.js script are needed, as both files are granted differing permission by Chrome.
  * TODO: this script really needs some at least rudimentary error handling.
- * @author: Ryan Lenea, Joseph Dirtay
+ * @author: Ryan Lenea, Joseph Wright
  */
 
 main();
@@ -122,7 +122,7 @@ function getUniCode(title) {
     let code;
     Object.entries(uni_codes).forEach(([key,value]) => {
         if(title.includes(`${value}`)) {
-            code = key
+            code = key;
         }
     });
 
