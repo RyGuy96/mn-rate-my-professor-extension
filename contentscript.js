@@ -167,13 +167,13 @@ function locateThenCreateRMPColumn(table) {
         }
 
         // Iterates over columns to get the last column which is populated with ratings.
-        for (let j = 0, col; col = row.cells[j]; j++) {
+        for (let j = 1, col; col = row.cells[j]; j++) {
             if (j === columnValue) {
                 let professor = col.innerText;
-                if (professor.indexOf(',') >= 0) {
-                    let fullName = col.innerText;
-                    createCellAndTooltip(fullName, newCell);
-                }
+                const name_array = professor.split('\n').filter(e => e)
+                .filter(function (ele) { return ele.length > 1});
+                     
+                if (name_array[0]) createCellAndTooltip(name_array[0], newCell);
             }
             if ($(col).hasClass('yui-dt0-col-Instructor')) {
                 columnValue = j;
@@ -192,8 +192,7 @@ function locateThenCreateRMPColumn(table) {
  */
 function createCellAndTooltip(fullName, newCell){
     let myurl = "https://search-production.ratemyprofessors.com/solr/rmp/select/?solrformat=true&rows=2&wt=json&q=";
-    fullNameFormatted = fullName.replace(/(\r\n|\n|\r)/gm, "");
-    let splitName =  fullNameFormatted.split(",");
+    let splitName =  fullName.split(",");
     let lastName = splitName[0].trim();
     let firstName = splitName[1].trim();
     myurl1 = myurl + firstName + "+" + lastName + "+AND+schoolid_s%" + getSchoolRMPId();
