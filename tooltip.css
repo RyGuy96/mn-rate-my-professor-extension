@@ -11,4 +11,6 @@
 	background: rgb(34,34,34);
 	color: #fff;
 	padding: 4px;
+	max-height: 45em;
+	max-width: 45em;
 }
