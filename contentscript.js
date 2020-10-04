@@ -259,18 +259,16 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
         let wouldTakeAgain = 0;
         let wouldTakeAgainNACount = 0;
 
-        //RYAN SPACEAPP ADDED START
-        // console.log(resp.ratings[0]);
         let attendanceRequired = 0;
         let attendanceRequiredNACount = 0;
 
         let profTags = {};
-        //RYAN SPACEAPP ADDED END
 
-        let foundFirstReview = false;
-        let firstReview = "";
+        // let foundFirstReview = false;
+        // let firstReview = "";
+        let comments = {};
 
-        // Calculate rating statistics, factoring in non-responders (N/A).
+        // Calculate rating statistics, factoring in non-responders (N/A); gather comments.
         for (let i = 0; i < resp.ratings.length; i++) {
             easyRating += resp.ratings[i].rEasy;
             if (resp.ratings[i].rWouldTakeAgain === "Yes") {
@@ -295,15 +293,18 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
                 }
             });
 
-            if (!foundFirstReview) {
-                firstReview = resp.ratings[i].rComments;
-                foundFirstReview = true;
-            }
+            // Keen running total of comments and their comments thumbs up
+            comments[resp.ratings[i].rComments] = resp.ratings[i].helpCount
+
+            // if (!foundFirstReview) {
+            //     firstReview = resp.ratings[i].rComments;
+            //     foundFirstReview = true;
+            // }
         }
 
-        if (!foundFirstReview) {
-            firstReview = "N/A";
-        }
+        // if (!foundFirstReview) {
+        //     firstReview = "N/A";
+        // }
 
         easyRating /= resp.ratings.length;
 
@@ -326,7 +327,7 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
             attendanceRequired = "N/A";
         }
 
-        //TODO process of getting counts should be shorter; shouldn't need helper sortByCount(); at present goes: data -> map -> array -> other array.
+        //TODO process of getting counts could be shorter.
         // Get x most mentioned tags for professor from hashmap of values.
         let topTags = sortByCount(profTags);
         topTags = topTags.slice(0, TAGS_PER_PROF);
@@ -335,7 +336,17 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
             tagsToInclude.push(topTags[j].name);
         }
 
-        let div = formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, firstReview);
+
+        // Sort comments by helpfulness rating
+        let orderedComments = [];
+        comments = sortByCount(comments);
+        let commentsSorted = [];
+        for (let k = 0; k < comments.length; k++) {
+            commentsSorted.push(comments[k].name);
+        }
+
+
+        let div = formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted);
         //RYAN SPACEAPP ADDED END
         newCell.class = "tooltip";
         putDataIntoTooltip(newCell, div);
@@ -353,7 +364,8 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
  * @param firstReview {string} the most recent review.
  * @returns {HTMLDivElement} the content to be placed into the tooltip.
  */
-function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, firstReview) {
+function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted) {
+
 
     let title = document.createElement("h3");
     title.textContent = "Rate My Professor Details";
@@ -368,21 +380,14 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     let wouldTakeAgainText = document.createElement("p");
     wouldTakeAgainText.textContent = "Would take again: " + wouldTakeAgain;
 
-    //RYAN SPACEAPP ADDED START
     let attendanceRequiredText = document.createElement("p");
     attendanceRequiredText.textContent = "Attendance Required: " + attendanceRequired;
 
     let topTagsText = document.createElement("p");
     topTagsText.textContent = "Top Tags: " + tagsToInclude.join(", ");
 
-    //RYAN SPACEAPP ADDED START
-
-    let classText = document.createElement("p");
-    classText.textContent = "Most recent review: ";
-
-    let commentText = document.createElement("p");
-    commentText.textContent = firstReview;
-    commentText.classList.add('paragraph');
+    let commentsHeader = document.createElement("p");
+    topTagsText.textContent = "Reviews:";
 
     let div = document.createElement("div");
     div.appendChild(title);
@@ -391,8 +396,14 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     div.appendChild(wouldTakeAgainText);
     div.appendChild(attendanceRequiredText);
     div.appendChild(topTagsText);
-    div.appendChild(classText);
-    div.appendChild(commentText);
+    div.appendChild(commentsHeader);
+
+    // TODO you'd think we could do this with </br> instead of having to make a new element for each review.
+    for (let j = 0; j < commentsSorted.length; j++) {
+        let commElem = document.createElement("p");
+        commElem.innerText = commentsSorted[j];
+        div.appendChild(commElem);
+    }
 
     return div;
 }
