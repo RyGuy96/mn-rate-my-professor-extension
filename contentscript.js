@@ -78,6 +78,7 @@ function getSchoolRMPId() {
 
     // Location cells often empty, so need to search whole table until find one
     let title;
+    
     locationCells = $(".yui-dt0-col-loc,.yui-dt-col-loc,.yui-dt-last");
     for (let i = 1; i < locationCells.length; i++){
         try {
@@ -91,49 +92,42 @@ function getSchoolRMPId() {
         }
     }
 
-    // School ID as key, title as value. Loop structure, IF title = key.value, return key
-    if (title.includes("Winona") || title.includes("WSU")) {
-        return "3A1214"
-    }
-    else if (title.includes("Rochester Community & Technical College") ) {
-        return "3A2752"
-    }
-    else if (title.includes("Vermilion Community College") ) {
-        return "3A2986"
-    }
-    else if (title.includes("Cloud Technical and Community College") ) {
-        return "3A2873"
-    }
-    else if (title.includes("Cloud State University") ) {
-        return "3A833"
-    }
-    else if (title.includes("Southwest Minnesota State University") ) {
-        return "3A937"
-    }
-    else if (title.includes("South Central College") ) {
-        return "3A2815"
-    }
-    else if (title.includes("Saint Paul College") ) {
-        return "3A2879"
-    }
-    else if (title.includes("Riverland") ) {
-        return "3A5610"
-    }
-    else if (title.includes("Willmar") ) { //Ridgewater
-        return "3A5236" //another campus should include 3A5638
-    }
-    else if (title.includes("Rainy River Community College") ) {
-        return "3A2720"
-    }
-    else if (title.includes("Pine Technical and Community College") ) {
-        return "3A2683"
-    }
-    else if (title.includes("Northwest Tech College") ) {
-        return "3A2589"
-    }
-
+    return getUniCode(title);
 }
 
+function getUniCode(title) {
+    let uni_codes = {
+        "3A1214":["Winona"],
+        "3A2752":["Rochester Community & Technical College"],
+        "3A2986":["Vermilion Community College"],
+        "3A2873":["Cloud Technical and Community College"],
+        "3A833":["Cloud State University"],
+        "3A937":["Southwest Minnesota State University"],
+        "3A2815":["South Central College"],
+        "3A2879":["Saint Paul College"],
+        "3A5610":["Riverland"],
+        "3A5236":["Willmar"],
+        "3A2720":["Rainy River Community College"],
+        "3A2683":["Pine Technical and Community College"],
+        "3A2589":["Northwest Tech College"],
+        "3A559":["Mankato"],
+        "3A5399":["Metropolitan State"],
+        "3A2465":["Minneapolis Comm"],
+        "3A2468":["Minnesota State College Southeast"],
+        "3A2058":["M State - Online"],
+        "3A4640":["Moorhead"],
+        "3A1832":["Century College"]
+    };
+
+    let code;
+    Object.entries(uni_codes).forEach(([key,value]) => {
+        if(title.includes(`${value}`)) {
+            code = key
+        }
+    });
+
+    return code;
+}
 
 /**
  * All functionality to create a RMP column with tooltips and ensure multiple columns not added, encompassed here.
