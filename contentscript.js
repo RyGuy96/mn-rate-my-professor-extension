@@ -384,7 +384,7 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     topTagsText.textContent = "Top Tags: " + tagsToInclude.join(", ");
 
     let commentsHeader = document.createElement("p");
-    topTagsText.textContent = "Reviews:";
+    commentsHeader.textContent = "Reviews (sorted by most thumbed up at top):";
 
     let div = document.createElement("div");
     div.appendChild(title);
@@ -399,8 +399,10 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     // TODO you'd think we could do this with </br> instead of having to make a new element for each review.
     for (let j = 0; j < commentsSorted.length; j++) {
         let commElem = document.createElement("p");
-        commElem.innerText = commentsSorted[j];
-        div.appendChild(commElem);
+        if (commentsSorted[j] !== "No Comments") {
+            commElem.innerText = commentsSorted[j];
+            div.appendChild(commElem);
+        }
     }
 
     return div;
