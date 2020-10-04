@@ -250,33 +250,33 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
         type: "tooltip"
     }, function(response) {
 
+        // Number of most popular tags for each professor to be added (RMP adds 5).
         const TAGS_PER_PROF = 5;
 
+        // Json object.
         let resp = response.JSONresponse;
 
         //Build content for professor tooltip
         let easyRating = 0;
         let wouldTakeAgain = 0;
         let wouldTakeAgainNACount = 0;
-
         let attendanceRequired = 0;
         let attendanceRequiredNACount = 0;
-
         let profTags = {};
-
-        // let foundFirstReview = false;
-        // let firstReview = "";
         let comments = {};
 
         // Calculate rating statistics, factoring in non-responders (N/A); gather comments.
         for (let i = 0; i < resp.ratings.length; i++) {
+
+            // Difficulty.
             easyRating += resp.ratings[i].rEasy;
             if (resp.ratings[i].rWouldTakeAgain === "Yes") {
                 wouldTakeAgain++;
             } else if (resp.ratings[i].rWouldTakeAgain === "N/A") {
                 wouldTakeAgainNACount++;
             }
-            //RYAN SPACEAPP ADDED START
+
+            // Attendance
             if (resp.ratings[i].attendance === "Mandatory") {
                 attendanceRequired++;
             } else if (resp.ratings[i].attendance === "N/A") {
@@ -293,18 +293,10 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
                 }
             });
 
-            // Keen running total of comments and their comments thumbs up
+            // Keen running total of comments and the number of likes for each.
             comments[resp.ratings[i].rComments] = resp.ratings[i].helpCount
 
-            // if (!foundFirstReview) {
-            //     firstReview = resp.ratings[i].rComments;
-            //     foundFirstReview = true;
-            // }
-        }
-
-        // if (!foundFirstReview) {
-        //     firstReview = "N/A";
-        // }
+        } // End for.
 
         easyRating /= resp.ratings.length;
 
@@ -315,8 +307,6 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
         } else {
             wouldTakeAgain = "N/A";
         }
-
-        //RYAN SPACEAPP ADDED START
 
 
         if (resp.ratings.length > 1) {
@@ -336,7 +326,6 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
             tagsToInclude.push(topTags[j].name);
         }
 
-
         // Sort comments by helpfulness rating
         let orderedComments = [];
         comments = sortByCount(comments);
@@ -345,9 +334,9 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
             commentsSorted.push(comments[k].name);
         }
 
-
+        // New div with all comment review info for a single professor.
         let div = formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted);
-        //RYAN SPACEAPP ADDED END
+
         newCell.class = "tooltip";
         putDataIntoTooltip(newCell, div);
 
@@ -361,8 +350,11 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
  * @param realLastName {string} professor last name formatted.
  * @param easyRating {int} professors's difficulty rating.
  * @param wouldTakeAgain {int} percent of students who would take professor's class again.
- * @param firstReview {string} the most recent review.
+ * @param attendanceRequired {int} percent of students who said attendance was mandatory.
+ * @param tagsToInclude {array} most popular tags listed in reviews.
+ * @param commentsSorted {array} reviews sorted by number of likes descending.
  * @returns {HTMLDivElement} the content to be placed into the tooltip.
+
  */
 function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted) {
 
@@ -398,6 +390,7 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     div.appendChild(topTagsText);
     div.appendChild(commentsHeader);
 
+    // Add in all reviews.
     // TODO you'd think we could do this with </br> instead of having to make a new element for each review.
     for (let j = 0; j < commentsSorted.length; j++) {
         let commElem = document.createElement("p");
