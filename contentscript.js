@@ -340,7 +340,7 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
         }
 
         // New div with all comment review info for a single professor.
-        let div = formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted);
+        let div = formatDataForTooltip(realFirstName, realLastName, allprofRatingsURL, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted);
 
         newCell.class = "tooltip";
         putDataIntoTooltip(newCell, div);
@@ -361,7 +361,9 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
  * @param commentsSorted {array} reviews sorted by number of likes descending.
  * @returns {HTMLDivElement} the content to be placed into the tooltip.
  */
-function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted) {
+// function formatDataForTooltip(realFirstName, realLastName, allprofRatingsURL, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted) {
+
+function formatDataForTooltip(realFirstName, realLastName, allprofRatingsURL, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted) {
 
 
     let title = document.createElement("h3");
@@ -369,6 +371,10 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
 
     let professorText = document.createElement("p");
     professorText.textContent = "Professor Name: " + realFirstName + " " + realLastName;
+
+    // TODO, get this to work as a hyperlink
+    // let professorRMPLink = document.createElement("p");
+    // professorRMPLink.textContent = "Click to go to RateMyProfessors.com: " + allprofRatingsURL;
 
     let easyRatingText = document.createElement("p");
     easyRatingText.textContent = "Level of Difficulty" + ": " + easyRating.toFixed(1)
@@ -389,6 +395,7 @@ function formatDataForTooltip(realFirstName, realLastName, easyRating, wouldTake
     let div = document.createElement("div");
     div.appendChild(title);
     div.appendChild(professorText);
+    // div.appendChild(professorRMPLink);
     div.appendChild(easyRatingText);
     div.appendChild(wouldTakeAgainText);
     div.appendChild(attendanceRequiredText);
@@ -427,7 +434,7 @@ function putDataIntoTooltip(newCell, div){
                     content: div,
                     interactive: true,
                     contentAsHTML: true,
-                    delay: 100
+                    delay: 100,
                 })
                 .tooltipster('show');
         }
@@ -453,7 +460,7 @@ function removeOldColumn(){
  * @param ratingCell {element}
  */
 function applyStyles(ratingCell){
-    ratingCell.innerHTML = "Overall Rating";
+    ratingCell.innerHTML = "Overall Rating (click rating to go to RMP.com)";
     ratingCell.style.fontWeight = "bold";
     ratingCell.style.verticalAlign = "bottom";
     ratingCell.style.paddingLeft = "1em";
