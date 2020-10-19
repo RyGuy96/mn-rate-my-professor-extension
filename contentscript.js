@@ -6,6 +6,8 @@
  * each professor with summary statistics.
  * Note: Both a background.js and content.js script are needed, as both files are granted differing permission by Chrome.
  * TODO: this script really needs some at least rudimentary error handling.
+ * TODO: make github issues instead of these todos so easier to track.
+ * TODO: scrolling should have a scroll bar so obvious that you can scroll
  * @author: Ryan Lenea, Joseph Wright
  */
 
@@ -26,6 +28,10 @@ function main() {
  */
 function handlePagination() {
     let elems = [];
+
+    //RYAN DEBUGGING oct 19 start
+    console.log("call to : " + "handlePagination()");
+    //RYAN DEBUGGING oct 19 end
 
     let topNav = document.querySelector("#yui-dt0-paginator0");
     let bottomNav = document.querySelector("#yui-dt0-paginator1");
@@ -52,6 +58,11 @@ function handlePagination() {
  * TODO: this is ridiculously sloppy; extension shouldn't inhibit normal user behavior in any way!
  */
 function handleIllegalClicks() {
+
+    //RYAN DEBUGGING oct 19 start
+    console.log("call to : " + "handleIllegalClicks()");
+    //RYAN DEBUGGING oct 19 end
+
     let elems2 = [];
 
     let topNav = document.querySelector("#yui-dt0-paginator0");
@@ -71,10 +82,14 @@ function handleIllegalClicks() {
 
 /**
  * Determine which school's registration page is being looked at by referencing location image.
- * TODO school data should be in json or xml doc not a million if-elses. Below almost worked, changed in manifest:
+ * TODO school data should be in json or xml doc not in code. Below almost worked, changed in manifest:
  * https://stackoverflow.com/questions/46667199/where-to-store-static-json-data-in-a-chrome-extension
  */
 function getSchoolRMPId() {
+
+    //RYAN DEBUGGING oct 19 start
+    console.log("call to : " + "getSchoolRMPId()");
+    //RYAN DEBUGGING oct 19 end
 
     // Location cells often empty, so need to search whole table until find one
     let title;
@@ -142,6 +157,10 @@ function getUniCode(title) {
  */
 function maintainRMPColumn() {
 
+    //RYAN DEBUGGING oct 19 start
+    console.log("call to : " + "maintainRMPColumn()");
+    //RYAN DEBUGGING oct 19 end
+
     removeOldColumn();
     let table = document.querySelector("#searchResultsContainer > table");
     if (table !== null) {
@@ -156,6 +175,10 @@ function maintainRMPColumn() {
  * @param table {element} the table holding most of the relevant page information.
  */
 function locateThenCreateRMPColumn(table) {
+
+    //RYAN DEBUGGING oct 19 start
+    console.log("call to : " + "locateThenCreateRMPColumn");
+    //RYAN DEBUGGING oct 19 end
 
     let newCell;
     let columnValue = 0;
@@ -203,6 +226,9 @@ function createCellAndTooltip(fullName, newCell){
     let firstName = splitName[1].trim();
     myurl1 = myurl + firstName + "+" + lastName + "+AND+schoolid_s%" + getSchoolRMPId();
     getProfessorRating(myurl1, newCell);
+    //RYAN DEBUGGING oct 19 start
+    console.log("call to: " + "createCellAndTooltip");
+    //RYAN DEBUGGING oct 19 end
 }
 
 
@@ -227,6 +253,9 @@ function getProfessorRating(myurl1, newCell) {
                 let profURL = "http://www.ratemyprofessors.com/ShowRatings.jsp?tid=" + profID;
                 newCell.innerHTML = "<a href=\"" + profURL + "\" target=\"_blank\">" + profRating + "</a>";
                 // TODO: max=20, is there reason for this? is it going to get more ratings than that?
+                //RYAN DEBUGGING oct 19 start
+                console.log("call to : " + "getProfessorRating");
+                //RYAN DEBUGGING oct 19 end
                 let allprofRatingsURL = "https://www.ratemyprofessors.com/paginate/professors/ratings?tid=" + profID + "&page=0&max=20";
                 addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName);
             } else {
@@ -250,6 +279,10 @@ function getProfessorRating(myurl1, newCell) {
  * @param realLastName {string} formatted last name.
  */
 function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
+
+    //RYAN DEBUGGING oct 19 start
+    console.log("call to : " + "addTooltip");
+    //RYAN DEBUGGING oct 19 end
 
     chrome.runtime.sendMessage({
         url: allprofRatingsURL,
@@ -354,6 +387,7 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
  * Formats a given professor's stats into a div, to (elsewhere) be placed into a tooltip.
  * @param realFirstName {string} professor first name formatted.
  * @param realLastName {string} professor last name formatted.
+ * @param allprofRatingsURL {string} url to rate my professor page for given professor.
  * @param easyRating {int} professors's difficulty rating.
  * @param wouldTakeAgain {int} percent of students who would take professor's class again.
  * @param attendanceRequired {int} percent of students who said attendance was mandatory.
@@ -365,6 +399,9 @@ function addTooltip(newCell, allprofRatingsURL, realFirstName, realLastName) {
 
 function formatDataForTooltip(realFirstName, realLastName, allprofRatingsURL, easyRating, wouldTakeAgain, attendanceRequired, tagsToInclude, commentsSorted) {
 
+    //RYAN DEBUGGING oct 19 start
+    console.log("call to : " + "formatDataForTooltip");
+    //RYAN DEBUGGING oct 19 end
 
     let title = document.createElement("h3");
     title.textContent = "Rate My Professor Details";
@@ -458,6 +495,7 @@ function removeOldColumn(){
 /**
  * Apply syles to tooltip and to header column.
  * @param ratingCell {element}
+ * TODO: there is a style in the style sheets that should apply this without having it here. Would allow further customization - Joe had idea after hackethon on correct file not being referenced.
  */
 function applyStyles(ratingCell){
     ratingCell.innerHTML = "Overall Rating (click rating to go to RMP.com)";

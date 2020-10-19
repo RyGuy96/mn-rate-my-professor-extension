@@ -4,7 +4,7 @@
  * Listens to all chrome messages and responds accordingly by reloading page or returning JSON from a GET request to
  * RateMyProfessors.com to contentscript.js.
  * Note: Both a background.js and content.js script are needed, as both files are granted differing permission by Chrome.
- * @author: Ryan Lenea
+ * @author: Ryan Lenea, Joseph Wright
  */
 
 
